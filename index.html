@@ -197,7 +197,7 @@ footer{position:relative;z-index:1;text-align:center;padding:2rem;border-top:1px
       Manivannan<br>
       <span class="line2">Renganathan</span>
     </h1>
-    <div class="hero-role"><span id="typed-text"></span><span class="cursor"></span></div>
+    <div class="hero-role"><span id="typed-text">Data Engineer</span><span class="cursor"></span></div>
     <p class="hero-desc">
       Building <strong>data pipelines</strong>, automating <strong>ETL/ELT workflows</strong>, and ensuring data quality at scale.
       <strong>3 years</strong> of production experience. SQL, Python, Pandas — real pipelines, not just tutorials.
@@ -435,6 +435,117 @@ footer{position:relative;z-index:1;text-align:center;padding:2rem;border-top:1px
 // CANVAS PARTICLES
 const canvas = document.getElementById('bg-canvas');
 const ctx = canvas.getContext('2d');
+let W, H, particles = [];
+
+function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+resize();
+window.addEventListener('resize', resize);
+
+function Particle(){
+  this.x = Math.random()*W; this.y = Math.random()*H;
+  this.size = Math.random()*1.5+0.5;
+  this.vx = (Math.random()-0.5)*0.3; this.vy = (Math.random()-0.5)*0.3;
+  this.op = Math.random()*0.4+0.1;
+}
+Particle.prototype.update = function(){
+  this.x += this.vx; this.y += this.vy;
+  if(this.x<0||this.x>W||this.y<0||this.y>H){
+    this.x=Math.random()*W; this.y=Math.random()*H;
+  }
+};
+Particle.prototype.draw = function(){
+  ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+  ctx.fillStyle='rgba(0,255,179,'+this.op+')'; ctx.fill();
+};
+for(var i=0;i<80;i++) particles.push(new Particle());
+
+function drawLines(){
+  for(var i=0;i<particles.length;i++){
+    for(var j=i+1;j<particles.length;j++){
+      var dx=particles[i].x-particles[j].x, dy=particles[i].y-particles[j].y;
+      var d=Math.sqrt(dx*dx+dy*dy);
+      if(d<120){
+        ctx.beginPath(); ctx.moveTo(particles[i].x,particles[i].y);
+        ctx.lineTo(particles[j].x,particles[j].y);
+        ctx.strokeStyle='rgba(0,255,179,'+(0.06*(1-d/120))+')';
+        ctx.lineWidth=0.5; ctx.stroke();
+      }
+    }
+  }
+}
+function animate(){ ctx.clearRect(0,0,W,H); particles.forEach(function(p){p.update();p.draw();}); drawLines(); requestAnimationFrame(animate); }
+animate();
+
+// NAV SCROLL
+window.addEventListener('scroll', function(){ document.getElementById('navbar').classList.toggle('scrolled', window.scrollY>50); });
+
+// TYPING EFFECT — starts immediately
+var roles = ['Data Engineer','ETL Pipeline Developer','SQL Specialist','Python Automation Engineer','Data Quality Engineer'];
+var rIdx=0, cIdx=0, del=false;
+var el = document.getElementById('typed-text');
+el.textContent = '';
+
+function typeIt(){
+  var cur = roles[rIdx];
+  if(!del){
+    cIdx++;
+    el.textContent = cur.slice(0, cIdx);
+    if(cIdx === cur.length){ del=true; setTimeout(typeIt, 2000); return; }
+    setTimeout(typeIt, 100);
+  } else {
+    cIdx--;
+    el.textContent = cur.slice(0, cIdx);
+    if(cIdx === 0){ del=false; rIdx=(rIdx+1)%roles.length; }
+    setTimeout(typeIt, 50);
+  }
+}
+setTimeout(typeIt, 500);
+
+// COUNTERS
+function runCounters(){
+  document.querySelectorAll('.counter').forEach(function(el){
+    var target = parseInt(el.getAttribute('data-target'));
+    var current = 0;
+    var step = target / 60;
+    var t = setInterval(function(){
+      current += step;
+      if(current >= target){ current = target; clearInterval(t); }
+      el.textContent = Math.floor(current);
+    }, 20);
+  });
+}
+
+// SCROLL REVEAL + skill bars
+var revealed = false;
+var countersRun = false;
+
+var io = new IntersectionObserver(function(entries){
+  entries.forEach(function(e){
+    if(e.isIntersecting){
+      e.target.classList.add('visible');
+      e.target.querySelectorAll('.skill-bar-fill').forEach(function(b){
+        setTimeout(function(){ b.style.width = b.getAttribute('data-width')+'%'; }, 200);
+      });
+    }
+  });
+}, {threshold: 0.1});
+
+document.querySelectorAll('.reveal').forEach(function(el){ io.observe(el); });
+
+// Stats counter trigger
+var statsEl = document.querySelector('.stats-strip');
+if(statsEl){
+  var sio = new IntersectionObserver(function(entries){
+    if(entries[0].isIntersecting && !countersRun){ countersRun=true; runCounters(); }
+  }, {threshold: 0.3});
+  sio.observe(statsEl);
+}
+// Also run counters after short delay as fallback
+setTimeout(function(){ if(!countersRun){ countersRun=true; runCounters(); } }, 1000);
+</script><script>
+// CANVAS PARTICLES
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
 let particles = [];
 let W, H;
 
@@ -517,7 +628,7 @@ function type(){
   }
   setTimeout(type,deleting?50:100);
 }
-setTimeout(type,1500);
+setTimeout(type,300);
 
 // COUNTER ANIMATION
 function animateCounters(){
