@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manivannan Renganathan — Data Engineer</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#04080f;
+  --s1:#080f1e;
+  --s2:#0d1628;
+  --accent:#00ffb3;
+  --accent2:#4d9fff;
+  --accent3:#ff6b6b;
+  --text:#dce8f5;
+  --muted:#4a5f80;
+  --border:rgba(0,255,179,0.08);
+  --mono:'Space Mono',monospace;
+  --sans:'Inter',sans-serif;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--sans);overflow-x:hidden}
+
+/* CANVAS BG */
+#bg-canvas{position:fixed;inset:0;z-index:0;opacity:0.4}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 3rem;display:flex;justify-content:space-between;align-items:center;transition:background 0.3s}
+nav.scrolled{background:rgba(4,8,15,0.95);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:var(--mono);font-size:0.8rem;color:var(--accent);letter-spacing:0.1em;display:flex;align-items:center;gap:0.6rem}
+.logo-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,255,179,0.4)}50%{box-shadow:0 0 0 8px rgba(0,255,179,0)}}
+.nav-links{display:flex;gap:2.5rem;list-style:none}
+.nav-links a{font-family:var(--mono);font-size:0.72rem;color:var(--muted);text-decoration:none;letter-spacing:0.06em;transition:color 0.2s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1px;background:var(--accent);transition:width 0.3s}
+.nav-links a:hover{color:var(--accent)}
+.nav-links a:hover::after{width:100%}
+
+/* HERO */
+#hero{min-height:100vh;display:flex;align-items:center;position:relative;z-index:1;padding:0 3rem}
+.hero-inner{max-width:900px}
+.hero-tag{font-family:var(--mono);font-size:0.7rem;color:var(--accent);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:2rem;opacity:0;animation:fadeUp 0.6s 0.2s ease forwards;display:flex;align-items:center;gap:1rem}
+.hero-tag::before{content:'';width:3rem;height:1px;background:var(--accent)}
+.hero-name{font-size:clamp(3.5rem,7vw,6rem);font-weight:700;line-height:1;letter-spacing:-0.04em;margin-bottom:1rem;opacity:0;animation:fadeUp 0.6s 0.4s ease forwards}
+.hero-name .line2{color:var(--accent);display:block}
+.hero-role{font-family:var(--mono);font-size:1.1rem;color:var(--muted);margin-bottom:2.5rem;opacity:0;animation:fadeUp 0.6s 0.6s ease forwards;min-height:1.6rem}
+.cursor{display:inline-block;width:2px;height:1.1rem;background:var(--accent);animation:blink 0.8s infinite;vertical-align:middle;margin-left:2px}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.hero-desc{font-size:1rem;color:var(--muted);max-width:560px;line-height:1.8;margin-bottom:3rem;opacity:0;animation:fadeUp 0.6s 0.8s ease forwards}
+.hero-desc strong{color:var(--text)}
+.hero-btns{display:flex;gap:1rem;flex-wrap:wrap;opacity:0;animation:fadeUp 0.6s 1s ease forwards}
+.btn-glow{padding:0.9rem 2rem;background:transparent;border:1px solid var(--accent);color:var(--accent);font-family:var(--mono);font-size:0.75rem;letter-spacing:0.08em;text-decoration:none;border-radius:4px;transition:all 0.3s;position:relative;overflow:hidden}
+.btn-glow::before{content:'';position:absolute;inset:0;background:var(--accent);transform:translateX(-100%);transition:transform 0.3s;z-index:-1}
+.btn-glow:hover{color:#04080f}
+.btn-glow:hover::before{transform:translateX(0)}
+.btn-outline{padding:0.9rem 2rem;background:transparent;border:1px solid var(--border);color:var(--muted);font-family:var(--mono);font-size:0.75rem;letter-spacing:0.08em;text-decoration:none;border-radius:4px;transition:all 0.3s}
+.btn-outline:hover{border-color:var(--accent);color:var(--accent)}
+
+/* STATS STRIP */
+.stats-strip{display:flex;gap:0;border:1px solid var(--border);border-radius:8px;overflow:hidden;margin-top:5rem;opacity:0;animation:fadeUp 0.6s 1.2s ease forwards}
+.stat-item{flex:1;padding:2rem 1.5rem;text-align:center;background:var(--s1);border-right:1px solid var(--border);transition:background 0.3s}
+.stat-item:last-child{border-right:none}
+.stat-item:hover{background:var(--s2)}
+.stat-num{font-family:var(--mono);font-size:2.2rem;font-weight:700;color:var(--accent);display:block;line-height:1}
+.stat-label{font-size:0.72rem;color:var(--muted);margin-top:0.5rem;letter-spacing:0.05em}
+
+/* SECTIONS */
+.section{position:relative;z-index:1;padding:8rem 3rem;max-width:1100px;margin:0 auto}
+.sec-label{font-family:var(--mono);font-size:0.65rem;color:var(--accent);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:0.75rem;display:flex;align-items:center;gap:0.75rem}
+.sec-label::before{content:'';width:1.5rem;height:1px;background:var(--accent)}
+h2{font-size:2.2rem;font-weight:700;letter-spacing:-0.03em;margin-bottom:3.5rem;line-height:1.1}
+
+/* ABOUT */
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start}
+.about-text p{font-size:0.92rem;color:#7a8fa8;line-height:1.85;margin-bottom:1.2rem}
+.about-text p strong{color:var(--text)}
+.about-text .hl{color:var(--accent);font-family:var(--mono);font-size:0.85em;background:rgba(0,255,179,0.05);padding:0.1rem 0.4rem;border-radius:3px}
+.info-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:2rem;position:relative;overflow:hidden}
+.info-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--accent),var(--accent2))}
+.info-card-title{font-family:var(--mono);font-size:0.62rem;color:var(--accent);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:1.5rem}
+.info-row{display:flex;justify-content:space-between;align-items:center;padding:0.7rem 0;border-bottom:1px solid var(--border);font-size:0.82rem}
+.info-row:last-child{border-bottom:none}
+.il{color:var(--muted)}
+.iv{color:var(--text);font-weight:500}
+.iv.g{color:var(--accent);font-family:var(--mono);font-size:0.75rem}
+.available-badge{display:inline-flex;align-items:center;gap:0.5rem;background:rgba(0,255,179,0.08);border:1px solid rgba(0,255,179,0.2);border-radius:100px;padding:0.3rem 0.8rem;font-family:var(--mono);font-size:0.65rem;color:var(--accent);margin-top:1.5rem}
+.available-badge .dot{width:6px;height:6px;background:var(--accent);border-radius:50%;animation:pulse 2s infinite}
+
+/* SKILLS */
+.skills-container{display:grid;grid-template-columns:repeat(2,1fr);gap:2rem}
+.skill-group{background:var(--s1);border:1px solid var(--border);border-radius:10px;padding:1.8rem;transition:border-color 0.3s,transform 0.3s}
+.skill-group:hover{border-color:rgba(0,255,179,0.25);transform:translateY(-3px)}
+.sg-title{font-family:var(--mono);font-size:0.62rem;color:var(--accent);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:1.5rem;padding-bottom:0.75rem;border-bottom:1px solid var(--border)}
+.skill-bar-row{margin-bottom:1rem}
+.skill-bar-top{display:flex;justify-content:space-between;margin-bottom:0.4rem;font-size:0.8rem}
+.skill-name{color:var(--text)}
+.skill-pct{font-family:var(--mono);font-size:0.7rem;color:var(--accent)}
+.skill-bar-bg{height:4px;background:var(--s2);border-radius:2px;overflow:hidden}
+.skill-bar-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;width:0;transition:width 1.2s cubic-bezier(0.4,0,0.2,1)}
+.skill-pills{display:flex;flex-wrap:wrap;gap:0.4rem;margin-top:0.5rem}
+.sp{font-family:var(--mono);font-size:0.65rem;padding:0.25rem 0.6rem;background:var(--s2);border-radius:3px;color:var(--muted);border:1px solid var(--border);transition:all 0.2s}
+.sp:hover{border-color:rgba(0,255,179,0.3);color:var(--accent)}
+
+/* PROJECTS */
+.proj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1.5rem}
+.proj-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:2rem;transition:all 0.3s;position:relative;overflow:hidden;cursor:default}
+.proj-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(0,255,179,0.03),rgba(77,159,255,0.03));opacity:0;transition:opacity 0.3s}
+.proj-card:hover{border-color:rgba(0,255,179,0.2);transform:translateY(-5px);box-shadow:0 20px 40px rgba(0,0,0,0.3)}
+.proj-card:hover::before{opacity:1}
+.proj-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.2rem}
+.proj-icon{width:40px;height:40px;border-radius:8px;background:rgba(0,255,179,0.08);border:1px solid rgba(0,255,179,0.15);display:flex;align-items:center;justify-content:center;font-size:1.2rem}
+.badge{font-family:var(--mono);font-size:0.6rem;letter-spacing:0.08em;text-transform:uppercase;padding:0.22rem 0.65rem;border-radius:100px}
+.badge-live{background:rgba(0,255,179,0.1);color:var(--accent);border:1px solid rgba(0,255,179,0.2)}
+.badge-wip{background:rgba(77,159,255,0.1);color:#7eb3ff;border:1px solid rgba(77,159,255,0.2)}
+.proj-title{font-size:1rem;font-weight:600;margin-bottom:0.6rem;line-height:1.3}
+.proj-desc{font-size:0.82rem;color:var(--muted);line-height:1.7;margin-bottom:1.3rem}
+.proj-stack{display:flex;flex-wrap:wrap;gap:0.35rem;margin-bottom:1.3rem}
+.pt{font-family:var(--mono);font-size:0.6rem;padding:0.18rem 0.5rem;background:var(--s2);border-radius:3px;color:var(--muted)}
+.proj-link{font-family:var(--mono);font-size:0.68rem;color:var(--accent);text-decoration:none;letter-spacing:0.05em;display:inline-flex;align-items:center;gap:0.4rem;transition:gap 0.2s}
+.proj-link:hover{gap:0.7rem}
+.proj-link.dim{color:var(--muted);pointer-events:none}
+
+/* EXPERIENCE */
+.exp-list{display:flex;flex-direction:column;gap:1.5rem}
+.exp-card{background:var(--s1);border:1px solid var(--border);border-radius:12px;padding:2.5rem;display:grid;grid-template-columns:220px 1fr;gap:3rem;transition:border-color 0.3s}
+.exp-card:hover{border-color:rgba(0,255,179,0.15)}
+.exp-left{border-right:1px solid var(--border);padding-right:2.5rem}
+.exp-period{font-family:var(--mono);font-size:0.65rem;color:var(--accent);letter-spacing:0.08em;margin-bottom:0.6rem}
+.exp-role{font-size:1rem;font-weight:600;margin-bottom:0.3rem;line-height:1.3}
+.exp-co{font-family:var(--mono);font-size:0.75rem;color:var(--muted);margin-bottom:1rem}
+.exp-scope{font-size:0.75rem;color:var(--muted);line-height:1.6}
+.exp-bullets{list-style:none;display:flex;flex-direction:column;gap:0.7rem;margin-bottom:1.5rem}
+.exp-bullets li{font-size:0.86rem;color:#7a8fa8;padding-left:1.3rem;position:relative;line-height:1.65}
+.exp-bullets li::before{content:'▸';position:absolute;left:0;color:var(--accent);font-size:0.6rem;top:0.28rem}
+.exp-tags{display:flex;flex-wrap:wrap;gap:0.4rem}
+.et{font-family:var(--mono);font-size:0.6rem;padding:0.18rem 0.55rem;background:rgba(0,255,179,0.05);border:1px solid rgba(0,255,179,0.12);border-radius:3px;color:var(--accent)}
+
+/* CONTACT */
+.contact-outer{position:relative;z-index:1;padding:8rem 3rem}
+.contact-inner{max-width:700px;margin:0 auto;text-align:center}
+.contact-card{background:var(--s1);border:1px solid var(--border);border-radius:16px;padding:4rem 3rem;position:relative;overflow:hidden}
+.contact-card::before{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(circle,rgba(0,255,179,0.03) 0%,transparent 60%);pointer-events:none}
+.contact-card h2{margin-bottom:0.75rem}
+.contact-card p{color:var(--muted);font-size:0.92rem;margin-bottom:2.5rem;line-height:1.7}
+.contact-btns{display:flex;justify-content:center;gap:1rem;flex-wrap:wrap;margin-bottom:2rem}
+.contact-info{font-family:var(--mono);font-size:0.7rem;color:var(--muted);line-height:2.2;border-top:1px solid var(--border);padding-top:1.5rem}
+
+/* FOOTER */
+footer{position:relative;z-index:1;text-align:center;padding:2rem;border-top:1px solid var(--border);font-family:var(--mono);font-size:0.65rem;color:var(--muted)}
+
+/* SCROLL REVEAL */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity 0.7s ease,transform 0.7s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:rgba(0,255,179,0.2);border-radius:2px}
+
+@media(max-width:768px){
+  nav{padding:1rem 1.5rem}
+  .nav-links{display:none}
+  #hero{padding:0 1.5rem}
+  .section{padding:5rem 1.5rem}
+  .stats-strip{flex-wrap:wrap}
+  .stat-item{flex:1 1 45%}
+  .about-grid,.skills-container,.proj-grid{grid-template-columns:1fr}
+  .exp-card{grid-template-columns:1fr;gap:1.5rem}
+  .exp-left{border-right:none;border-bottom:1px solid var(--border);padding-right:0;padding-bottom:1.5rem}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<nav id="navbar">
+  <div class="nav-logo"><span class="logo-dot"></span> MR · DATA ENGINEER</div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#experience">Experience</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-inner">
+    <div class="hero-tag">Available for opportunities · Chennai / Remote</div>
+    <h1 class="hero-name">
+      Manivannan<br>
+      <span class="line2">Renganathan</span>
+    </h1>
+    <div class="hero-role"><span id="typed-text"></span><span class="cursor"></span></div>
+    <p class="hero-desc">
+      Building <strong>data pipelines</strong>, automating <strong>ETL/ELT workflows</strong>, and ensuring data quality at scale.
+      <strong>3 years</strong> of production experience. SQL, Python, Pandas — real pipelines, not just tutorials.
+    </p>
+    <div class="hero-btns">
+      <a href="mailto:mvn9206@gmail.com" class="btn-glow">GET IN TOUCH</a>
+      <a href="https://www.linkedin.com/in/manivannan-renganathan-00a88a259" target="_blank" class="btn-outline">LINKEDIN</a>
+      <a href="https://github.com/mvn9206" target="_blank" class="btn-outline">GITHUB</a>
+    </div>
+    <div class="stats-strip">
+      <div class="stat-item"><span class="stat-num counter" data-target="3">0</span><div class="stat-label">Years Experience</div></div>
+      <div class="stat-item"><span class="stat-num counter" data-target="50">0</span><div class="stat-label">K+ Records / Month</div></div>
+      <div class="stat-item"><span class="stat-num counter" data-target="32">0</span><div class="stat-label">K+ Skills Taxonomy</div></div>
+      <div class="stat-item"><span class="stat-num counter" data-target="97">0</span><div class="stat-label">%+ QA Pass Rate</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<div class="section reveal" id="about">
+  <div class="sec-label">About</div>
+  <h2>Who I am</h2>
+  <div class="about-grid">
+    <div class="about-text">
+      <p>I'm a Data Engineer based in <strong>Chennai, India</strong> with 3 years of production experience building data pipelines and ETL/ELT workflows at a global labour market intelligence company.</p>
+      <p>My core work involves <strong>ingesting and transforming large-scale datasets</strong>, writing advanced SQL for validation, and building Python automation scripts that cut manual effort and improve upstream data quality.</p>
+      <p>I've integrated <strong>OpenAI API into normalisation pipelines</strong> — designing prompt-based workflows to automate job title classification at scale. Messy real-world data, constrained systems, reliable outputs.</p>
+      <p>Currently building personal projects in <span class="hl">Apache Airflow</span>, <span class="hl">dbt</span>, and <span class="hl">BigQuery</span> to complete the modern DE stack.</p>
+    </div>
+    <div>
+      <div class="info-card">
+        <div class="info-card-title">Quick Facts</div>
+        <div class="info-row"><span class="il">Location</span><span class="iv">Chennai, Tamil Nadu</span></div>
+        <div class="info-row"><span class="il">Experience</span><span class="iv">3 years</span></div>
+        <div class="info-row"><span class="il">Current employer</span><span class="iv">Lightcast India</span></div>
+        <div class="info-row"><span class="il">Notice period</span><span class="iv g">15 days</span></div>
+        <div class="info-row"><span class="il">Open to</span><span class="iv">DE · ETL Dev · Pipeline Eng</span></div>
+        <div class="info-row"><span class="il">Work mode</span><span class="iv">Onsite / Hybrid / Remote</span></div>
+        <div class="info-row"><span class="il">Email</span><span class="iv g">mvn9206@gmail.com</span></div>
+      </div>
+      <div class="available-badge"><span class="dot"></span> Open to new opportunities</div>
+    </div>
+  </div>
+</div>
+
+<!-- SKILLS -->
+<div class="section reveal" id="skills">
+  <div class="sec-label">Technical Skills</div>
+  <h2>What I work with</h2>
+  <div class="skills-container">
+    <div class="skill-group">
+      <div class="sg-title">Core Languages</div>
+      <div class="skill-bar-row">
+        <div class="skill-bar-top"><span class="skill-name">SQL (Advanced)</span><span class="skill-pct">95%</span></div>
+        <div class="skill-bar-bg"><div class="skill-bar-fill" data-width="95"></div></div>
+      </div>
+      <div class="skill-bar-row">
+        <div class="skill-bar-top"><span class="skill-name">Python</span><span class="skill-pct">80%</span></div>
+        <div class="skill-bar-bg"><div class="skill-bar-fill" data-width="80"></div></div>
+      </div>
+      <div class="skill-bar-row">
+        <div class="skill-bar-top"><span class="skill-name">Pandas</span><span class="skill-pct">82%</span></div>
+        <div class="skill-bar-bg"><div class="skill-bar-fill" data-width="82"></div></div>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="sg-title">Pipeline & ETL</div>
+      <div class="skill-bar-row">
+        <div class="skill-bar-top"><span class="skill-name">ETL / ELT</span><span class="skill-pct">88%</span></div>
+        <div class="skill-bar-bg"><div class="skill-bar-fill" data-width="88"></div></div>
+      </div>
+      <div class="skill-bar-row">
+        <div class="skill-bar-top"><span class="skill-name">Data Quality / QA</span><span class="skill-pct">90%</span></div>
+        <div class="skill-bar-bg"><div class="skill-bar-fill" data-width="90"></div></div>
+      </div>
+      <div class="skill-bar-row">
+        <div class="skill-bar-top"><span class="skill-name">PostgreSQL</span><span class="skill-pct">85%</span></div>
+        <div class="skill-bar-bg"><div class="skill-bar-fill" data-width="85"></div></div>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="sg-title">Cloud & Orchestration</div>
+      <div class="skill-pills">
+        <span class="sp">BigQuery</span><span class="sp">AWS S3</span><span class="sp">Apache Airflow</span>
+        <span class="sp">dbt</span><span class="sp">DAG Design</span><span class="sp">Data Warehousing</span>
+      </div>
+    </div>
+    <div class="skill-group">
+      <div class="sg-title">Tools & Platforms</div>
+      <div class="skill-pills">
+        <span class="sp">Metabase</span><span class="sp">OpenAI API</span><span class="sp">Jira</span>
+        <span class="sp">Confluence</span><span class="sp">pgAdmin 4</span><span class="sp">Excel</span>
+        <span class="sp">Google Sheets</span><span class="sp">Prompt Engineering</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROJECTS -->
+<div class="section reveal" id="projects">
+  <div class="sec-label">Personal Projects</div>
+  <h2>What I've built</h2>
+  <div class="proj-grid">
+
+    <div class="proj-card">
+      <div class="proj-top">
+        <div class="proj-icon">📊</div>
+        <span class="badge badge-live">Live</span>
+      </div>
+      <div class="proj-title">HR Dataset — SQL Analytics Pipeline</div>
+      <p class="proj-desc">Imported a 37-column HR dataset into PostgreSQL. Advanced SQL — window functions, CTEs, attrition analysis, salary distributions, data quality checks.</p>
+      <div class="proj-stack">
+        <span class="pt">PostgreSQL</span><span class="pt">pgAdmin 4</span><span class="pt">SQL</span><span class="pt">Window Functions</span><span class="pt">CTEs</span>
+      </div>
+      <a href="https://github.com/mvn9206/hr-sql-analytics" target="_blank" class="proj-link">VIEW ON GITHUB →</a>
+    </div>
+
+    <div class="proj-card">
+      <div class="proj-top">
+        <div class="proj-icon">⚙️</div>
+        <span class="badge badge-wip">In Progress</span>
+      </div>
+      <div class="proj-title">Public Jobs ETL Pipeline</div>
+      <p class="proj-desc">End-to-end ETL pipeline on Kaggle job postings. Python ingestion → Pandas cleaning → PostgreSQL load → dbt models → Airflow DAG scheduling.</p>
+      <div class="proj-stack">
+        <span class="pt">Python</span><span class="pt">Pandas</span><span class="pt">PostgreSQL</span><span class="pt">Airflow</span><span class="pt">dbt</span>
+      </div>
+      <a href="https://github.com/mvn9206/jobs-etl-pipeline" target="_blank" class="proj-link">VIEW ON GITHUB →</a>
+    </div>
+
+    <div class="proj-card">
+      <div class="proj-top">
+        <div class="proj-icon">☁️</div>
+        <span class="badge badge-wip">In Progress</span>
+      </div>
+      <div class="proj-title">BigQuery + dbt Analytics Stack</div>
+      <p class="proj-desc">Modern ELT stack on BigQuery public datasets. dbt staging, intermediate, and mart models with lineage graphs, schema tests, and documentation.</p>
+      <div class="proj-stack">
+        <span class="pt">BigQuery</span><span class="pt">dbt</span><span class="pt">SQL</span><span class="pt">ELT</span><span class="pt">Data Warehousing</span>
+      </div>
+      <a href="https://github.com/mvn9206/bigquery-dbt-stack" target="_blank" class="proj-link">VIEW ON GITHUB →</a>
+    </div>
+
+    <div class="proj-card">
+      <div class="proj-top">
+        <div class="proj-icon">🔍</div>
+        <span class="badge badge-live">Live</span>
+      </div>
+      <div class="proj-title">Python Data Quality Checker</div>
+      <p class="proj-desc">Reusable Python library for automated data validation — null checks, type validation, duplicate detection, range checks, regex, and HTML/JSON reports with scoring.</p>
+      <div class="proj-stack">
+        <span class="pt">Python</span><span class="pt">Pandas</span><span class="pt">pytest</span><span class="pt">QA Automation</span>
+      </div>
+      <a href="https://github.com/mvn9206/data-quality-checker" target="_blank" class="proj-link">VIEW ON GITHUB →</a>
+    </div>
+
+  </div>
+</div>
+
+<!-- EXPERIENCE -->
+<div class="section reveal" id="experience">
+  <div class="sec-label">Where I've worked</div>
+  <h2>Experience</h2>
+  <div class="exp-list">
+
+    <div class="exp-card">
+      <div class="exp-left">
+        <div class="exp-period">MAR 2025 — PRESENT</div>
+        <div class="exp-role">Implementation Enablement Associate</div>
+        <div class="exp-co">Lightcast India Pvt Ltd</div>
+        <div class="exp-scope">Pipeline ownership · AI integration · Data quality engineering</div>
+      </div>
+      <div class="exp-right">
+        <ul class="exp-bullets">
+          <li>Owned end-to-end data ingestion pipelines processing 50,000+ workforce records per month across 10+ enterprise clients.</li>
+          <li>Built Python and Pandas automation reducing manual pre-processing effort by ~60%.</li>
+          <li>Integrated OpenAI API into job title classification using prompt-based automation workflows.</li>
+          <li>Maintained 97%+ QA pass rate via 100+ production SQL queries across 32,000+ skills taxonomy.</li>
+          <li>Led root cause analysis, resolving 95%+ of pipeline discrepancies within SLA.</li>
+          <li>Monitored pipeline health across 3+ Metabase dashboards, reducing downstream errors by ~25%.</li>
+        </ul>
+        <div class="exp-tags">
+          <span class="et">Python</span><span class="et">Pandas</span><span class="et">SQL</span><span class="et">PostgreSQL</span><span class="et">OpenAI API</span><span class="et">ETL</span><span class="et">Metabase</span><span class="et">Jira</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="exp-card">
+      <div class="exp-left">
+        <div class="exp-period">MAR 2023 — MAR 2025</div>
+        <div class="exp-role">Data Aggregation Associate</div>
+        <div class="exp-co">Lightcast India Pvt Ltd</div>
+        <div class="exp-scope">SQL validation · Data normalisation · QA · Documentation</div>
+      </div>
+      <div class="exp-right">
+        <ul class="exp-bullets">
+          <li>Mapped 100,000+ job titles to occupational taxonomy across a 32,000+ item library for 10+ clients.</li>
+          <li>Ran SQL validation across 10,000–20,000 record batches, maintaining 95%+ accuracy.</li>
+          <li>Authored 8+ SOPs adopted by a 5-member team, reducing onboarding time by ~30%.</li>
+          <li>Tracked QA metrics across 5+ concurrent projects using Excel and Google Sheets.</li>
+        </ul>
+        <div class="exp-tags">
+          <span class="et">SQL</span><span class="et">Data Normalisation</span><span class="et">QA</span><span class="et">Excel</span><span class="et">Documentation</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- CONTACT -->
+<div class="contact-outer reveal" id="contact">
+  <div class="contact-inner">
+    <div class="sec-label" style="justify-content:center">Contact</div>
+    <div class="contact-card">
+      <h2>Let's work together</h2>
+      <p>Open to Data Engineer, ETL Developer, and Data Pipeline Engineer roles in Chennai or remote. Available with 15 days notice.</p>
+      <div class="contact-btns">
+        <a href="mailto:mvn9206@gmail.com" class="btn-glow">SEND EMAIL</a>
+        <a href="https://www.linkedin.com/in/manivannan-renganathan-00a88a259" target="_blank" class="btn-outline">LINKEDIN</a>
+        <a href="https://github.com/mvn9206" target="_blank" class="btn-outline">GITHUB</a>
+      </div>
+      <div class="contact-info">
+        <div>mvn9206@gmail.com</div>
+        <div>+91 9626289206</div>
+        <div>Chennai, Tamil Nadu, India</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>Manivannan Renganathan &nbsp;·&nbsp; Data Engineer &nbsp;·&nbsp; Chennai, India &nbsp;·&nbsp; Built with passion</footer>
+
+<script>
+// CANVAS PARTICLES
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let particles = [];
+let W, H;
+
+function resize(){W=canvas.width=window.innerWidth;H=canvas.height=window.innerHeight}
+resize();
+window.addEventListener('resize',resize);
+
+class Particle{
+  constructor(){this.reset()}
+  reset(){
+    this.x=Math.random()*W;
+    this.y=Math.random()*H;
+    this.size=Math.random()*1.5+0.5;
+    this.speedX=(Math.random()-0.5)*0.3;
+    this.speedY=(Math.random()-0.5)*0.3;
+    this.opacity=Math.random()*0.4+0.1;
+  }
+  update(){
+    this.x+=this.speedX;
+    this.y+=this.speedY;
+    if(this.x<0||this.x>W||this.y<0||this.y>H)this.reset();
+  }
+  draw(){
+    ctx.beginPath();
+    ctx.arc(this.x,this.y,this.size,0,Math.PI*2);
+    ctx.fillStyle=`rgba(0,255,179,${this.opacity})`;
+    ctx.fill();
+  }
+}
+
+for(let i=0;i<80;i++)particles.push(new Particle());
+
+// Draw connections
+function drawConnections(){
+  for(let i=0;i<particles.length;i++){
+    for(let j=i+1;j<particles.length;j++){
+      const dx=particles[i].x-particles[j].x;
+      const dy=particles[i].y-particles[j].y;
+      const dist=Math.sqrt(dx*dx+dy*dy);
+      if(dist<120){
+        ctx.beginPath();
+        ctx.moveTo(particles[i].x,particles[i].y);
+        ctx.lineTo(particles[j].x,particles[j].y);
+        ctx.strokeStyle=`rgba(0,255,179,${0.06*(1-dist/120)})`;
+        ctx.lineWidth=0.5;
+        ctx.stroke();
+      }
+    }
+  }
+}
+
+function animate(){
+  ctx.clearRect(0,0,W,H);
+  particles.forEach(p=>{p.update();p.draw()});
+  drawConnections();
+  requestAnimationFrame(animate);
+}
+animate();
+
+// NAV SCROLL
+window.addEventListener('scroll',()=>{
+  document.getElementById('navbar').classList.toggle('scrolled',window.scrollY>50);
+});
+
+// TYPING EFFECT
+const roles=['Data Engineer','ETL Pipeline Developer','SQL Specialist','Python Automation Engineer','Data Quality Engineer'];
+let roleIdx=0,charIdx=0,deleting=false;
+const typedEl=document.getElementById('typed-text');
+
+function type(){
+  const current=roles[roleIdx];
+  if(!deleting){
+    typedEl.textContent=current.slice(0,charIdx+1);
+    charIdx++;
+    if(charIdx===current.length){setTimeout(()=>{deleting=true},2000);setTimeout(type,100);return}
+  }else{
+    typedEl.textContent=current.slice(0,charIdx-1);
+    charIdx--;
+    if(charIdx===0){deleting=false;roleIdx=(roleIdx+1)%roles.length}
+  }
+  setTimeout(type,deleting?50:100);
+}
+setTimeout(type,1500);
+
+// COUNTER ANIMATION
+function animateCounters(){
+  document.querySelectorAll('.counter').forEach(el=>{
+    const target=parseInt(el.dataset.target);
+    let current=0;
+    const step=target/60;
+    const timer=setInterval(()=>{
+      current+=step;
+      if(current>=target){current=target;clearInterval(timer)}
+      el.textContent=Math.floor(current);
+    },20);
+  });
+}
+
+// SCROLL REVEAL
+const observer=new IntersectionObserver((entries)=>{
+  entries.forEach(entry=>{
+    if(entry.isIntersecting){
+      entry.target.classList.add('visible');
+      // Trigger skill bars
+      entry.target.querySelectorAll('.skill-bar-fill').forEach(bar=>{
+        setTimeout(()=>{bar.style.width=bar.dataset.width+'%'},200);
+      });
+    }
+  });
+},{threshold:0.1});
+
+document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+
+// Trigger counters when stats come into view
+const statsObserver=new IntersectionObserver((entries)=>{
+  if(entries[0].isIntersecting)animateCounters();
+},{threshold:0.5});
+const strip=document.querySelector('.stats-strip');
+if(strip)statsObserver.observe(strip);
+</script>
+</body>
+</html>
